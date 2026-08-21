@@ -37,7 +37,7 @@ output directory: `/`). You get HTTPS immediately.
 works, but you cannot serve `/.well-known/` reliably on some free subdomains, and a real
 domain is worth having anyway. Cloudflare Registrar sells at cost, roughly **$10/year**.
 
-Once live, replace `certpay.app` throughout the project with your domain:
+Once live, replace `certpay.net` throughout the project with your domain:
 
 ```bash
 cd certpay

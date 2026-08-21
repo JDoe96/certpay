@@ -68,7 +68,7 @@ You said Cloudflare currently just has the domain. Now we connect the site.
    There is no build step. It is plain HTML. If you put anything in "build command" the
    deploy will fail.
 4. **Save and Deploy**. Takes about a minute.
-5. You'll get a `something.pages.dev` URL. Open it — the CertPay site should load.
+5. You'll get a `certpay.net` URL. Open it — the CertPay site should load.
 6. Now attach your domain: in the Pages project → **Custom domains** → **Set up a custom
    domain** → type your domain → follow the prompts.
 
@@ -88,7 +88,7 @@ That third one matters — the Android build fails without it.
 
 ## Step 3 — Put your domain in the files
 
-The files still say `certpay.app`. That affects your sitemap, canonical URLs, and the app
+The files still say `certpay.net`. That affects your sitemap, canonical URLs, and the app
 build.
 
 **The easy way** — GitHub Desktop has a built-in terminal:
@@ -104,7 +104,7 @@ build.
    (`Set live domain`) and **Push origin**.
 
 **If that command errors**, do it by hand — it's a find-and-replace. Open the folder in a
-text editor and replace `certpay.app` with your domain in these files:
+text editor and replace `certpay.net` with your domain in these files:
 
 ```
 index.html            robots.txt              sitemap.xml

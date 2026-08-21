@@ -20,14 +20,14 @@ time on it.
 
 ```bash
 npm install -g @bubblewrap/cli
-bubblewrap init --manifest https://certpay.app/app/manifest.webmanifest
+bubblewrap init --manifest https://certpay.net/app/manifest.webmanifest
 ```
 
 Answer the prompts:
 
 | Prompt | Answer |
 |---|---|
-| Domain | `certpay.app` |
+| Domain | `certpay.net` |
 | URL path | `/app/` |
 | Application name | `CertPay — Certified Payroll` |
 | Short name | `CertPay` |
@@ -65,7 +65,7 @@ site repo, replacing `REPLACE_WITH_YOUR_SIGNING_KEY_SHA256_FINGERPRINT`. Redeplo
 Verify it is live and correct:
 
 ```bash
-curl https://certpay.app/.well-known/assetlinks.json
+curl https://certpay.net/.well-known/assetlinks.json
 ```
 
 Then confirm with Google's tester:
@@ -91,7 +91,7 @@ Create the app, then fill in:
   no user-generated content
 - **Data safety:** declare **no data collected and no data shared**. This is true: everything
   is in `localStorage`. Say so plainly; it is a competitive advantage in this category.
-- **Privacy policy URL:** `https://certpay.app/privacy/` — required even when you collect
+- **Privacy policy URL:** `https://certpay.net/privacy/` — required even when you collect
   nothing
 
 Upload the `.aab`, roll out to **internal testing** first, install on a real device, confirm

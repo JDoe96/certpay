@@ -25,7 +25,7 @@ Then at https://dash.cloudflare.com → Workers & Pages → Create → Pages →
 | Build output directory | `/` |
 | Framework preset | None |
 
-You get `certpay.pages.dev` immediately, with HTTPS. That is enough to launch.
+You get `certpay.net` immediately, with HTTPS. That is enough to launch.
 
 ### Netlify alternative
 
@@ -33,9 +33,9 @@ Drag the folder onto https://app.netlify.com/drop. `netlify.toml` is already con
 
 ### A custom domain — optional, ~$10/yr
 
-`certpay.app` or similar from Cloudflare Registrar (sold at cost). Not required to start,
+`certpay.net` or similar from Cloudflare Registrar (sold at cost). Not required to start,
 but you need a real domain before submitting to Google Play, and it helps SEO. If you skip
-it, replace every `certpay.app` in the HTML with your `.pages.dev` address.
+it, replace every `certpay.net` in the HTML with your `.pages.dev` address.
 
 **After deploying, update these:**
 - `sitemap.xml` — the six URLs
@@ -68,7 +68,7 @@ Stripe takes 2.9% + 30¢ on actual revenue and nothing otherwise.
 1. Create a Stripe account.
 2. Products → add **CertPay Pro**, recurring, **$29/month**. Add a **$290/year** price too.
 3. Payment Links → create a link for the monthly price.
-4. Under "After payment" → redirect to `https://certpay.app/app/?upgraded=1`.
+4. Under "After payment" → redirect to `https://certpay.net/app/?upgraded=1`.
 5. Paste the link into `app/app.js`:
 
 ```js
@@ -91,7 +91,7 @@ Full walkthrough in `store/twa/build-instructions.md`. Summary:
 
 ```bash
 npm install -g @bubblewrap/cli
-bubblewrap init --manifest https://certpay.app/app/manifest.webmanifest
+bubblewrap init --manifest https://certpay.net/app/manifest.webmanifest
 bubblewrap build
 bubblewrap fingerprint list      # paste SHA-256 into /.well-known/assetlinks.json, redeploy
 ```

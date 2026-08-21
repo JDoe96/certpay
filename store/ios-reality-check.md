@@ -34,7 +34,7 @@ learn nothing.
 
 **On iOS, ship the Safari install instead.** It genuinely works:
 
-1. Open `certpay.app/app/` in Safari
+1. Open `certpay.net/app/` in Safari
 2. Share → **Add to Home Screen**
 3. It launches full-screen with the icon, no address bar, and works offline
 
