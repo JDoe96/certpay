@@ -1,0 +1,267 @@
+name: Build Android app
+
+# Builds the Google Play / Galaxy Store bundle in the cloud.
+# You never install Java, the Android SDK, or WSL on your own machine.
+#
+# HOW TO RUN IT:
+#   GitHub → your repo → Actions tab → "Build Android app" → Run workflow
+#
+# FIRST RUN: leave "create_keystore" ticked. It makes your signing key and
+# gives it to you as a download. Save it, then add it as a secret (the run
+# summary tells you exactly how).
+#
+# EVERY RUN AFTER: untick it. The build reuses the key from your secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Your live domain (no https://, e.g. mycertpay.com)'
+        required: true
+        type: string
+      create_keystore:
+        description: 'First time? Tick this to create your signing key.'
+        required: true
+        type: boolean
+        default: true
+      version_code:
+        description: 'Version code — increase by 1 for each Play upload'
+        required: true
+        type: string
+        default: '1'
+      version_name:
+        description: 'Version shown to users'
+        required: true
+        type: string
+        default: '1.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check the site is live
+        run: |
+          DOMAIN="${{ inputs.domain }}"
+          echo "Checking https://$DOMAIN/app/manifest.webmanifest"
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://$DOMAIN/app/manifest.webmanifest" || echo 000)
+          if [ "$CODE" != "200" ]; then
+            echo ""
+            echo "::error::Could not load https://$DOMAIN/app/manifest.webmanifest (got HTTP $CODE)."
+            echo "Your site must be deployed and live on HTTPS before building the app."
+            echo "Check Cloudflare Pages has finished deploying, then run this again."
+            exit 1
+          fi
+          echo "Site is live."
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli@1.22.0
+
+      # Bubblewrap checks for a legacy tools/ folder that modern SDK installs
+      # don't create. Without this it reports "The provided androidSdk isn't correct."
+      - name: Work around Bubblewrap SDK layout check
+        run: |
+          mkdir -p "$ANDROID_HOME/tools"
+          ln -sfn "$ANDROID_HOME/cmdline-tools/latest/bin" "$ANDROID_HOME/tools/bin"
+          ln -sfn "$ANDROID_HOME/cmdline-tools/latest/lib" "$ANDROID_HOME/tools/lib"
+          mkdir -p "$HOME/.bubblewrap"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_HOME" "$ANDROID_HOME" \
+            > "$HOME/.bubblewrap/config.json"
+          cat "$HOME/.bubblewrap/config.json"
+
+      - name: Create or restore the signing key
+        id: keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          mkdir -p build && cd build
+          if [ "${{ inputs.create_keystore }}" = "true" ]; then
+            PASS="cp$(openssl rand -hex 12)"
+            keytool -genkeypair -v -keystore android.keystore -alias android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$PASS" -keypass "$PASS" \
+              -dname "CN=CertPay, OU=Dev, O=CertPay, L=Brunswick, ST=GA, C=US"
+            echo "$PASS" > keystore-password.txt
+            base64 -w0 android.keystore > keystore-base64.txt
+            echo "NEW_KEY=yes" >> $GITHUB_OUTPUT
+            echo "PASS=$PASS" >> $GITHUB_ENV
+          else
+            if [ -z "$KEYSTORE_B64" ]; then
+              echo "::error::No saved signing key found. Either tick 'create_keystore', or add the ANDROID_KEYSTORE_BASE64 and ANDROID_KEYSTORE_PASSWORD secrets from your first run."
+              exit 1
+            fi
+            echo "$KEYSTORE_B64" | base64 -d > android.keystore
+            echo "PASS=$KEYSTORE_PASSWORD" >> $GITHUB_ENV
+            echo "NEW_KEY=no" >> $GITHUB_OUTPUT
+          fi
+          ls -la android.keystore
+
+      - name: Write the TWA manifest
+        run: |
+          cd build
+          python3 - "${{ inputs.domain }}" "${{ inputs.version_code }}" "${{ inputs.version_name }}" <<'PY'
+          import json, sys
+          domain, vcode, vname = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+          base = f"https://{domain}"
+          json.dump({
+            "packageId": "app.certpay.twa", "host": domain,
+            "name": "CertPay — Certified Payroll", "launcherName": "CertPay",
+            "display": "standalone", "orientation": "default",
+            "themeColor": "#12467b", "themeColorDark": "#0e3963",
+            "navigationColor": "#12467b", "navigationColorDark": "#0e3963",
+            "navigationDividerColor": "#12467b", "navigationDividerColorDark": "#0e3963",
+            "backgroundColor": "#f5f7f9", "enableNotifications": False,
+            "startUrl": "/app/index.html",
+            "iconUrl": f"{base}/icons/icon-512.png",
+            "maskableIconUrl": f"{base}/icons/maskable-512.png",
+            "webManifestUrl": f"{base}/app/manifest.webmanifest",
+            "fullScopeUrl": f"{base}/app/",
+            "splashScreenFadeOutDuration": 300,
+            "signingKey": {"path": "./android.keystore", "alias": "android"},
+            "appVersionName": vname, "appVersionCode": vcode,
+            # Every shortcut MUST carry chosenIconUrl or the build fails.
+            "shortcuts": [
+              {"name": "New payroll week", "shortName": "New week",
+               "url": "/app/index.html?tab=hours",
+               "chosenIconUrl": f"{base}/icons/icon-192.png"},
+              {"name": "Review & file", "shortName": "Review",
+               "url": "/app/index.html?tab=review",
+               "chosenIconUrl": f"{base}/icons/icon-192.png"}
+            ],
+            "generatorApp": "bubblewrap-cli", "fallbackType": "customtabs",
+            "features": {}, "alphaDependencies": {"enabled": False},
+            "enableSiteSettingsShortcut": True,
+            "isChromeOSOnly": False, "isMetaQuest": False,
+            "minSdkVersion": 21, "fingerprints": []
+          }, open("twa-manifest.json", "w"), indent=2)
+          print("manifest written for", domain, "version", vcode, vname)
+          PY
+
+      - name: Generate the Android project
+        run: |
+          cd build
+          bubblewrap update --skipVersionUpgrade
+
+      - name: Build the app bundle
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.PASS }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.PASS }}
+        run: |
+          cd build
+          bubblewrap build --skipPwaValidation --skipVersionUpgrade
+          ls -la *.aab *.apk
+
+      - name: Produce assetlinks.json
+        run: |
+          cd build
+          FP=$(keytool -list -v -keystore android.keystore -storepass "$PASS" 2>/dev/null \
+               | grep "SHA256:" | head -1 | sed 's/.*SHA256: //' | tr -d ' ')
+          echo "FINGERPRINT=$FP" >> $GITHUB_ENV
+          cat > assetlinks.json <<EOF
+          [{
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+              "namespace": "android_app",
+              "package_name": "app.certpay.twa",
+              "sha256_cert_fingerprints": ["$FP"]
+            }
+          }]
+          EOF
+          cat assetlinks.json
+
+      - name: Verify the build
+        run: |
+          cd build
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          echo "### Build verification" >> $GITHUB_STEP_SUMMARY
+          "$BT/apksigner" verify --print-certs app-release-signed.apk | head -3 \
+            | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY || true
+          "$BT/aapt2" dump badging app-release-signed.apk 2>/dev/null \
+            | grep -E "^package|targetSdk" | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY || true
+
+      - name: Upload the app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: certpay-android
+          path: |
+            build/app-release-bundle.aab
+            build/app-release-signed.apk
+            build/assetlinks.json
+          retention-days: 90
+
+      - name: Upload the signing key (first run only)
+        if: steps.keystore.outputs.NEW_KEY == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SIGNING-KEY-BACK-THIS-UP
+          path: |
+            build/android.keystore
+            build/keystore-password.txt
+            build/keystore-base64.txt
+          retention-days: 90
+
+      - name: What to do next
+        run: |
+          {
+            echo "## Your app is built"
+            echo ""
+            echo "Download the files from the **Artifacts** section at the bottom of this page."
+            echo ""
+            if [ "${{ steps.keystore.outputs.NEW_KEY }}" = "yes" ]; then
+              echo "### 1. Save your signing key — do this first"
+              echo ""
+              echo "Download **SIGNING-KEY-BACK-THIS-UP**. It contains the only key that can"
+              echo "ever update this app. If you lose it you must start a new Play listing."
+              echo ""
+              echo "Then add two repository secrets so future builds reuse it."
+              echo "Settings → Secrets and variables → Actions → New repository secret:"
+              echo ""
+              echo "| Secret name | Value |"
+              echo "|---|---|"
+              echo "| \`ANDROID_KEYSTORE_BASE64\` | the whole contents of \`keystore-base64.txt\` |"
+              echo "| \`ANDROID_KEYSTORE_PASSWORD\` | the contents of \`keystore-password.txt\` |"
+              echo ""
+              echo "After that, untick **create_keystore** on every future run."
+              echo ""
+            fi
+            echo "### 2. Publish your asset links"
+            echo ""
+            echo "Copy \`assetlinks.json\` into your repo at \`.well-known/assetlinks.json\`,"
+            echo "commit, and let Cloudflare redeploy. Then check it loads:"
+            echo ""
+            echo "    https://${{ inputs.domain }}/.well-known/assetlinks.json"
+            echo ""
+            echo "Skip this and the app opens with a browser address bar over it."
+            echo ""
+            echo "### 3. Upload to the stores"
+            echo ""
+            echo "Upload \`app-release-bundle.aab\` to Google Play, and the same file to"
+            echo "Samsung Galaxy Store."
+            echo ""
+            echo "After your **first** Play upload, Google re-signs the app with their own key."
+            echo "Go to Play Console → Setup → App integrity → App signing, copy that SHA-256,"
+            echo "and add it to \`assetlinks.json\` as a **second** fingerprint in the list."
+            echo ""
+            echo "### Your signing fingerprint"
+            echo ""
+            echo "    $FINGERPRINT"
+          } >> $GITHUB_STEP_SUMMARY

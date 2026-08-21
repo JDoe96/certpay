@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12467b">
+<meta name="description" content="Generate DOL Form WH-347 and California A-1-131 certified payroll reports. Validates prevailing wage, fringe and overtime before you file. Works offline.">
+<title>CertPay — Certified Payroll</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CertPay">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="logo"><span class="mark">CP</span><span>CertPay</span></div>
+  <span class="plan" id="planTag">FREE</span>
+  <span id="offlineDot" title="Online"></span>
+  <div class="sp"></div>
+  <button id="btnInstall" hidden>Install</button>
+  <button class="opt" onclick="Store.backup()">Backup</button>
+  <button class="opt" onclick="document.getElementById('restoreFile').click()">Restore</button>
+  <input type="file" id="restoreFile" accept=".json" hidden>
+  <button class="pri" onclick="UI.print()">Print / PDF</button>
+</header>
+
+<div class="projbar">
+  <span class="jbadge" id="jBadge">FEDERAL</span>
+  <select id="projSel" title="Switch project"></select>
+  <button onclick="App.newProject()">+ New project</button>
+  <button class="opt" onclick="App.renameProject()">Rename</button>
+  <button class="opt" onclick="App.deleteProject()">Delete</button>
+  <span class="right" id="weekLabel" style="opacity:.85"></span>
+</div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main>
+  <!-- ==================== SETUP ==================== -->
+  <section class="panel" data-p="setup">
+    <div class="card">
+      <h2>Which form do you file?</h2>
+      <div class="sub">This changes the calculations, not just the printout — California adds daily overtime, double time and SDI.</div>
+      <div class="grid g2">
+        <label class="f"><span>Jurisdiction</span>
+          <select class="inp" id="f_jur">
+            <option value="federal">Federal — Davis-Bacon, Form WH-347</option>
+            <option value="ca">California — public works, Form A-1-131</option>
+          </select></label>
+        <label class="f"><span>Pay frequency</span>
+          <select class="inp" id="f_freq">
+            <option value="weekly">Weekly (required for federal)</option>
+            <option value="biweekly">Bi-weekly</option>
+          </select></label>
+      </div>
+      <div id="jurNote" class="note" style="margin-top:13px"></div>
+    </div>
+
+    <div class="card">
+      <h2>Payroll week</h2>
+      <div class="sub">One report per week, per project. Number them consecutively from 1.</div>
+      <div class="grid g4">
+        <label class="f"><span>Payroll No.</span><input class="inp" id="p_num" placeholder="1" inputmode="numeric"></label>
+        <label class="f"><span>Week ending <span class="hint">(last day)</span></span><input class="inp" type="date" id="p_weekEnding"></label>
+        <label class="f"><span>Week beginning</span><input class="inp" id="p_weekStart" disabled></label>
+        <label class="f"><span>Final payroll?</span>
+          <select class="inp" id="p_final"><option value="no">No</option><option value="yes">Yes — final for project</option></select></label>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn sec sm" onclick="App.nextWeek()">Start next week from this one →</button>
+        <span class="note">Carries the crew, classifications and rates forward. You re-enter only hours.</span>
+      </div>
+      <hr class="s">
+      <div class="row">
+        <button class="btn sec sm" onclick="App.renameProject()">Rename project</button>
+        <button class="btn sec sm" onclick="App.deleteProject()">Delete project</button>
+        <button class="btn sec sm" onclick="Store.backup()">Download backup</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Contractor</h2>
+      <div class="sub">Your company — not the awarding agency.</div>
+      <div class="grid g2">
+        <label class="f"><span>Name of contractor or subcontractor</span><input class="inp" id="c_name" placeholder="Acme Electric LLC"></label>
+        <label class="f"><span>You are the…</span>
+          <select class="inp" id="c_role"><option value="contractor">Contractor (prime)</option><option value="subcontractor">Subcontractor</option></select></label>
+        <label class="f" style="grid-column:1/-1"><span>Address</span><input class="inp" id="c_addr" placeholder="118 Bay St, Brunswick, GA 31520"></label>
+      </div>
+      <div class="grid g3 ca-only" style="margin-top:13px">
+        <label class="f"><span>CSLB licence no.</span><input class="inp" id="c_license" placeholder="1043928"></label>
+        <label class="f"><span>DIR registration no.</span><input class="inp" id="c_pwcr" placeholder="1000012345"></label>
+        <label class="f"><span>Workers' comp policy no.</span><input class="inp" id="c_wc" placeholder="WC-8841203"></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Project</h2>
+      <div class="grid g2">
+        <label class="f"><span>Project and location</span><input class="inp" id="j_name" placeholder="Glynn County Elementary — Brunswick, GA"></label>
+        <label class="f"><span>Project or contract no.</span><input class="inp" id="j_contract" placeholder="ED-2026-114"></label>
+        <label class="f"><span>Wage determination no.</span><input class="inp" id="j_wd" placeholder="GA20260012 Mod 4"></label>
+        <label class="f"><span>Awarding agency</span><input class="inp" id="j_agency" placeholder="Glynn County Board of Education"></label>
+        <label class="f ca-only"><span>DIR Project ID</span><input class="inp" id="j_dirId" placeholder="123456"></label>
+      </div>
+      <hr class="s">
+      <div class="note" id="wdNote"></div>
+    </div>
+  </section>
+
+  <!-- ==================== RATES ==================== -->
+  <section class="panel" data-p="rates">
+    <div class="card">
+      <h2>Wage determination rates</h2>
+      <div class="sub">Enter each classification exactly as worded on the determination. Every worker is checked against these before you can file cleanly.</div>
+      <div style="overflow-x:auto"><table class="dt" id="ratesTbl"></table></div>
+      <div class="row" style="margin-top:13px">
+        <button class="btn sec sm" onclick="App.addClass()">+ Add classification</button>
+        <button class="btn sec sm" onclick="App.sampleRates()">Load example set</button>
+      </div>
+      <hr class="s">
+      <div class="note"><b>Required package = base rate + fringe.</b> You may pay fringe in cash on the cheque or into a bona fide plan, but the two together must always meet the determination. The overtime premium is calculated on the <b>base rate only</b> — fringe is never multiplied. Paying 1.5× on the full package is the single most common overpayment; paying 1.5× on base but forgetting fringe entirely is the most common underpayment.</div>
+    </div>
+  </section>
+
+  <!-- ==================== CREW ==================== -->
+  <section class="panel" data-p="crew">
+    <div class="card">
+      <h2>Crew</h2>
+      <div class="sub">Everyone who performed manual labour on the site this week. Office staff and salaried supervisors who do no manual work are excluded.</div>
+      <div id="crewLock"></div>
+      <div style="overflow-x:auto"><table class="dt" id="crewTbl"></table></div>
+      <div class="row" style="margin-top:13px"><button class="btn sec sm" onclick="App.addWorker()">+ Add worker</button></div>
+      <hr class="s">
+      <div class="note" id="ssnNote"></div>
+    </div>
+  </section>
+
+  <!-- ==================== HOURS ==================== -->
+  <section class="panel" data-p="hours">
+    <div class="card">
+      <h2>Hours worked on this project</h2>
+      <div class="sub" id="hoursSub"></div>
+      <div class="hourgrid" id="hoursGrid"></div>
+      <hr class="s">
+      <div class="note" id="hoursNote"></div>
+    </div>
+  </section>
+
+  <!-- ==================== PAY ==================== -->
+  <section class="panel" data-p="pay">
+    <div class="card">
+      <h2>Pay &amp; deductions</h2>
+      <div class="sub">Gross comes from hours × rates. Enter the deductions actually withheld — net wages must tie to the cheque you issued.</div>
+      <div id="payList"></div>
+      <hr class="s">
+      <div class="note"><b>Deductions beyond the standard ones</b> — taxes, FICA, court-ordered support, authorised union dues — must be described on the certification. Anything that pushes a worker below the prevailing wage (tools, uniforms, transport, cash back) is a violation whether or not the worker agreed to it.</div>
+    </div>
+  </section>
+
+  <!-- ==================== REVIEW ==================== -->
+  <section class="panel" data-p="review">
+    <div class="kpi" id="kpi"></div>
+    <div class="card">
+      <h2>Compliance check</h2>
+      <div class="sub">These are the errors that actually get payrolls rejected or produce back-wage findings.</div>
+      <div id="checks"></div>
+    </div>
+    <div class="card">
+      <h2>Statement of Compliance</h2>
+      <div class="sub">The part you sign. A false statement here carries criminal liability, so read the fringe election carefully.</div>
+      <div class="grid g2">
+        <label class="f"><span>Signatory name</span><input class="inp" id="s_name" placeholder="Dana Whitfield"></label>
+        <label class="f"><span>Title</span><input class="inp" id="s_title" placeholder="Owner"></label>
+      </div>
+      <div style="margin-top:15px">
+        <span style="font-size:12px;font-weight:650;color:var(--ink2)">How are fringe benefits paid?</span>
+        <div style="margin-top:8px;font-size:14px;line-height:2">
+          <label style="display:block"><input type="radio" name="fmode" value="plan"> <b>4(a)</b> — into approved plans, funds or programmes</label>
+          <label style="display:block"><input type="radio" name="fmode" value="cash"> <b>4(b)</b> — in cash, on the worker's cheque</label>
+          <label style="display:block"><input type="radio" name="fmode" value="both"> Mixed — describe under exceptions</label>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <label class="f"><span>Exceptions <span class="hint">craft — explanation</span></span><textarea class="inp" id="s_exceptions" rows="3" placeholder="None"></textarea></label>
+        <label class="f"><span>Remarks</span><textarea class="inp" id="s_remarks" rows="3" placeholder="Apprentice J. Ruiz registered with GA DOL, programme GA-2019-041, 2nd period, 65% of journeyman rate."></textarea></label>
+      </div>
+    </div>
+    <div class="card">
+      <h2>File it</h2>
+      <div class="sub" id="fileNote"></div>
+      <div class="row">
+        <button class="btn" onclick="UI.print()">Print / Save as PDF</button>
+        <button class="btn sec" onclick="Store.backup()">Download backup</button>
+        <button class="btn sec" onclick="document.getElementById('restoreFile').click()">Restore backup</button>
+        <button class="btn sec" onclick="App.exportCSV()">Export CSV</button>
+      </div>
+      <div class="note" style="margin-top:12px">In the print dialog choose <b>Destination: Save as PDF</b>. Page 1 prints landscape, the certification portrait. Both must be submitted together. Keep payrolls and time records for <b>3 years</b> after the project ends (California: 3 years from completion, and you must produce them within 10 days of a written request).</div>
+    </div>
+  </section>
+</main>
+
+<div class="fab">
+  <button class="btn sec" onclick="UI.prevTab()">←</button>
+  <button class="btn" onclick="UI.nextTab()">Next →</button>
+</div>
+
+<div id="print"></div>
+<div class="toast" id="toast"></div>
+
+<dialog id="upgradeDlg"><div class="dlg">
+  <h3>Upgrade to CertPay Pro</h3>
+  <p style="color:var(--mut);font-size:14px;margin:6px 0 16px">Unlimited crew, no watermark, unlimited projects, CSV export and state forms.</p>
+  <div style="background:#f5f7f9;border-radius:10px;padding:14px;font-size:14px;line-height:1.9;margin-bottom:16px">
+    <b style="font-size:20px">$29</b> / month &nbsp;·&nbsp; or $290 / year<br>
+    <span style="color:var(--mut)">Cancel anytime. One payroll clerk-hour a month pays for it.</span>
+  </div>
+  <div class="row">
+    <button class="btn" onclick="Pay.checkout()">Continue to payment</button>
+    <button class="btn sec" onclick="document.getElementById('upgradeDlg').close()">Not now</button>
+  </div>
+  <div class="note" style="margin-top:14px">Have a licence key? <a href="#" onclick="Pay.enterKey();return false">Enter it here</a>.</div>
+</div></dialog>
+
+<script src="./engine.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

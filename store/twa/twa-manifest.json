@@ -1,0 +1,53 @@
+{
+  "packageId": "app.certpay.twa",
+  "host": "certpay.app",
+  "name": "CertPay \u2014 Certified Payroll",
+  "launcherName": "CertPay",
+  "display": "standalone",
+  "themeColor": "#12467b",
+  "themeColorDark": "#0e3963",
+  "navigationColor": "#12467b",
+  "navigationColorDark": "#0e3963",
+  "navigationDividerColor": "#12467b",
+  "navigationDividerColorDark": "#0e3963",
+  "backgroundColor": "#f5f7f9",
+  "enableNotifications": false,
+  "startUrl": "/app/index.html",
+  "iconUrl": "https://certpay.app/icons/icon-512.png",
+  "maskableIconUrl": "https://certpay.app/icons/maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "New payroll week",
+      "shortName": "New week",
+      "url": "/app/index.html?tab=hours",
+      "chosenIconUrl": "https://certpay.app/icons/icon-192.png"
+    },
+    {
+      "name": "Review & file",
+      "shortName": "Review",
+      "url": "/app/index.html?tab=review",
+      "chosenIconUrl": "https://certpay.app/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://certpay.app/app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://certpay.app/app/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": []
+}

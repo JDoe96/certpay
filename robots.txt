@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://certpay.app/sitemap.xml

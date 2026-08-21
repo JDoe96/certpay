@@ -1,0 +1,16 @@
+{
+  "name": "certpay",
+  "version": "1.0.0",
+  "description": "Certified payroll (WH-347 and California A-1-131) generator and validator for construction contractors.",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 3000",
+    "test": "node test.js",
+    "test:e2e": "node e2e.js",
+    "shots": "node shots.js"
+  },
+  "devDependencies": {
+    "@bubblewrap/cli": "^1.25.0",
+    "playwright": "^1.47.2"
+  }
+}
