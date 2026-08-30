@@ -92,7 +92,7 @@ const Store = {
 
 /* ------------------------------------------------------------------- pay */
 const Pay = {
-  CHECKOUT_URL: '',                       // ← paste your Stripe Payment Link here
+  CHECKOUT_URL: 'https://buy.stripe.com/aFa8wO9cSfFLgkp7bwfQI00',                       // ← paste your Stripe Payment Link here
   init() {
     const q = new URLSearchParams(location.search);
     if (q.get('upgraded') === '1') { localStorage.setItem('certpay.pro','1'); history.replaceState({},'',location.pathname); UI.toast('Pro unlocked — thank you'); }

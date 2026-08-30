@@ -1,0 +1,71 @@
+{
+  "name": "CertPay \u2014 Certified Payroll",
+  "short_name": "CertPay",
+  "description": "Generate and validate WH-347 and California A-1-131 certified payroll reports. Works offline; your payroll data never leaves the device.",
+  "id": "/app/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f7f9",
+  "theme_color": "#12467b",
+  "categories": [
+    "business",
+    "productivity",
+    "finance"
+  ],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "../icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "../icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New payroll week",
+      "short_name": "New week",
+      "url": "./index.html?tab=hours",
+      "icons": [
+        {
+          "src": "../icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Review & file",
+      "short_name": "Review",
+      "url": "./index.html?tab=review",
+      "icons": [
+        {
+          "src": "../icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

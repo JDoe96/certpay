@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certified Payroll Overtime and Fringe Benefits: The Correct Calculation</title>
+<meta name="description" content="Why the Davis-Bacon overtime premium is 1.5x the base rate and never 1.5x fringe, with worked examples, a free calculator, and the cash-versus-plan decision explained.">
+<link rel="canonical" href="https://certpay.net/guides/certified-payroll-overtime-fringe-benefits/">
+<meta name="theme-color" content="#12467b">
+<link rel="icon" href="/icons/favicon.ico">
+<link rel="stylesheet" href="/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is fringe multiplied by 1.5 for overtime?","acceptedAnswer":{"@type":"Answer","text":"No. The Davis-Bacon overtime premium applies to the basic hourly rate only. Fringe benefits are owed on every hour worked at the straight-time rate and are never multiplied by 1.5."}},
+{"@type":"Question","name":"Can I pay fringe benefits in cash?","acceptedAnswer":{"@type":"Answer","text":"Yes. You may pay the fringe portion as cash wages on the cheque, contribute it to a bona fide benefit plan, or split it between the two, as long as base plus fringe together meet the wage determination."}},
+{"@type":"Question","name":"What happens if I underpay the fringe portion?","acceptedAnswer":{"@type":"Answer","text":"The shortfall becomes back wages owed to the worker, plus interest. Contract payments can be withheld until it is paid, and wilful or repeated violations can lead to debarment from federal contracts for up to three years."}}]}
+</script>
+</head>
+<body>
+
+<nav class="site"><div class="wrap">
+  <a class="brand" href="/"><span class="mark">CP</span> CertPay</a>
+  <a class="nl hide" href="/guides/">Guides</a>
+  <span class="sp"></span>
+  <a class="btn sm" href="/app/">Open the app</a>
+</div></nav>
+
+<article><div class="narrow">
+  <h1>Certified payroll overtime and fringe benefits, calculated correctly</h1>
+  <div class="meta">Certified payroll · Updated August 2026 · About 10 minutes</div>
+
+  <p>There is one calculation at the centre of Davis-Bacon compliance, and most people get it slightly wrong in
+  one of two directions. Either they multiply the fringe benefit by 1.5 for overtime hours and quietly overpay,
+  or they pay 1.5× the base and forget fringe on those hours entirely, which creates a back-wage liability
+  that grows every week until someone notices.</p>
+
+  <p>This page is the arithmetic, worked slowly, with the reasoning behind it.</p>
+
+  <div class="toc">
+    <h4>On this page</h4>
+    <ol>
+      <li><a href="#two">The two numbers on every determination</a></li>
+      <li><a href="#rule">The rule in one sentence</a></li>
+      <li><a href="#why">Why fringe is not multiplied</a></li>
+      <li><a href="#calc">Calculator</a></li>
+      <li><a href="#cash">Cash or plan: which to choose</a></li>
+      <li><a href="#annualise">Annualisation, the trap in plan contributions</a></li>
+      <li><a href="#split">Workers on more than one job</a></li>
+      <li><a href="#state">Where state law changes the answer</a></li>
+      <li><a href="#faq">Common questions</a></li>
+    </ol>
+  </div>
+
+  <h2 id="two">The two numbers on every determination</h2>
+  <p>Open any wage determination and each classification shows two figures:</p>
+  <table>
+    <tr><th>Classification</th><th>Rate</th><th>Fringes</th><th>Total package</th></tr>
+    <tr><td>Electrician</td><td>$34.85</td><td>$14.20</td><td><b>$49.05</b></td></tr>
+    <tr><td>Laborer, Group 1</td><td>$19.40</td><td>$8.65</td><td><b>$28.05</b></td></tr>
+  </table>
+  <p>The <b>rate</b> is the basic hourly rate. The <b>fringes</b> are the hourly value of benefits. Your
+  obligation is the total: the worker must receive at least $49.05 per hour in combined value. How you split it
+  is largely up to you.</p>
+
+  <h2 id="rule">The rule in one sentence</h2>
+  <div class="note ok" style="font-size:17px"><b>The overtime premium applies to the basic hourly rate only.
+  Fringe is owed on every hour at the straight-time value and is never multiplied.</b></div>
+
+  <p>Which gives you, for cash-paid fringe:</p>
+  <table>
+    <tr><th>Hours</th><th>Rate paid</th></tr>
+    <tr><td>Straight time</td><td><code>base + fringe</code></td></tr>
+    <tr><td>Overtime</td><td><code>(base × 1.5) + fringe</code></td></tr>
+    <tr><td>Double time <span style="color:var(--mut)">(where state law requires)</span></td><td><code>(base × 2) + fringe</code></td></tr>
+  </table>
+
+  <h3>The same numbers, three ways</h3>
+  <p>Electrician at $34.85 + $14.20, working 48 hours:</p>
+  <table>
+    <tr><th>Method</th><th>OT rate</th><th>Week's gross</th><th>Verdict</th></tr>
+    <tr><td><b>Correct:</b> (34.85 × 1.5) + 14.20</td><td>$66.48</td><td>$2,493.80</td><td class="y">Compliant</td></tr>
+    <tr><td><b>Over:</b> 49.05 × 1.5</td><td>$73.58</td><td>$2,550.60</td><td>Legal, but you gave away $56.80 this week</td></tr>
+    <tr><td><b>Under:</b> 34.85 × 1.5, no fringe on OT</td><td>$52.28</td><td>$2,384.20</td><td class="n">$109.60 in back wages</td></tr>
+  </table>
+  <p>The underpayment is $109.60 on one worker in one week. On a crew of eight across a six-month project,
+  that is roughly $22,000 in back wages, before interest and penalties, all from one misunderstood cell in a
+  spreadsheet.</p>
+
+  <h2 id="why">Why fringe is not multiplied</h2>
+  <p>Overtime exists to make excess hours expensive for the employer and worthwhile for the worker — that is
+  the Fair Labor Standards Act's job. The fringe benefit is different in kind: it is the hourly value of
+  health cover, pension, and training. The 41st hour does not make an hour of health insurance cost more than
+  the 40th.</p>
+  <p>So the FLSA premium attaches to the cash wage, and the fringe rides along unmultiplied. Cash fringe is
+  also generally excludable from the regular rate for overtime purposes when it is a bona fide fringe payment
+  — which is why the premium is computed on base and the fringe is simply added to every hour.</p>
+
+  <h2 id="calc">Calculator</h2>
+  <div class="calc">
+    <div class="g">
+      <div><label>Base rate ($/hr)</label><input id="b" type="number" step="0.01" value="34.85"></div>
+      <div><label>Fringe ($/hr)</label><input id="f" type="number" step="0.01" value="14.20"></div>
+      <div><label>Hours this week</label><input id="h" type="number" step="0.25" value="48"></div>
+    </div>
+    <div class="g">
+      <div><label>Fringe paid as</label>
+        <select id="m" style="width:100%;padding:9px 11px;border:1px solid #ccd3dc;border-radius:8px;font:inherit">
+          <option value="cash">Cash on the cheque</option>
+          <option value="plan">Into a benefit plan</option>
+        </select></div>
+      <div><label>Base rate you actually pay</label><input id="pb" type="number" step="0.01" value="34.85"></div>
+      <div><label>Fringe you actually provide</label><input id="pf" type="number" step="0.01" value="14.20"></div>
+    </div>
+    <div class="out" id="out"></div>
+  </div>
+  <script>
+  function calc(){
+    const n=id=>parseFloat(document.getElementById(id).value)||0;
+    const b=n('b'),f=n('f'),h=n('h'),pb=n('pb'),pf=n('pf');
+    const cash=document.getElementById('m').value==='cash';
+    const st=Math.min(h,40), ot=Math.max(0,h-40);
+    const cf=cash?pf:0;
+    const stR=pb+cf, otR=pb*1.5+cf;
+    const gross=st*stR+ot*otR;
+    const req=b+f, act=pb+pf;
+    const short=req-act;
+    const m=x=>x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    let html='Straight time: <b>'+st+' hrs</b> × $'+m(stR)+' = $'+m(st*stR)+'<br>';
+    if(ot) html+='Overtime: <b>'+ot+' hrs</b> × $'+m(otR)+' = $'+m(ot*otR)+
+      ' <span style="color:#667283">(base '+m(pb)+' × 1.5'+(cash?' + fringe '+m(pf):'')+')</span><br>';
+    html+='Gross this week: <b>$'+m(gross)+'</b><br>';
+    if(!cash) html+='<span style="color:#667283">Plus $'+m(pf*h)+' contributed to plans for '+h+' hours.</span><br>';
+    html+='<hr style="border:none;border-top:1px solid #dde3ea;margin:10px 0">';
+    if(short>0.004){
+      html+='<span style="color:#b3261e"><b>Below the determination.</b> Required package $'+m(req)+
+        '/hr, you are providing $'+m(act)+'/hr — short $'+m(short)+'/hr on '+h+' hours = <b>$'+m(short*h)+
+        ' owed</b> to this worker for this week alone.</span>';
+    } else {
+      html+='<span style="color:#0f7b3e"><b>Meets the determination.</b> Required $'+m(req)+
+        '/hr, providing $'+m(act)+'/hr.</span>';
+    }
+    document.getElementById('out').innerHTML=html;
+  }
+  ['b','f','h','pb','pf','m'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+  document.getElementById('m').addEventListener('change',calc); calc();
+  </script>
+  <p style="font-size:15px;color:var(--mut)">Runs entirely in your browser. Nothing is sent anywhere.</p>
+
+  <h2 id="cash">Cash or plan: which to choose</h2>
+  <p>You may discharge the fringe obligation three ways: cash on the cheque, contributions to a bona fide plan,
+  or a mix. The compliance test is the same — base plus fringe must meet the determination — but the
+  consequences differ.</p>
+  <table>
+    <tr><th></th><th>Cash on the cheque</th><th>Bona fide plan</th></tr>
+    <tr><td>Payroll tax</td><td>Taxable — you pay FICA and FUTA on it</td><td class="y">Generally not subject to payroll tax</td></tr>
+    <tr><td>Overtime maths</td><td>Rides on every hour, unmultiplied</td><td>Sits outside the cash rate entirely</td></tr>
+    <tr><td>Admin</td><td class="y">Trivial</td><td>Plan documents, contributions, annualisation</td></tr>
+    <tr><td>Cost at $14.20/hr, 2,000 hrs</td><td>$28,400 + ~$2,173 employer FICA</td><td class="y">$28,400</td></tr>
+    <tr><td>Best for</td><td>Small crews, occasional public work</td><td>Steady prevailing-wage volume</td></tr>
+  </table>
+  <p>The pattern: cash is simpler and costs you the payroll tax; plans are cheaper at volume and cost you
+  administration. Contractors doing occasional public work almost always pay cash, and that is a perfectly
+  sound choice.</p>
+
+  <h2 id="annualise">Annualisation, the trap in plan contributions</h2>
+  <p>If you take credit for a plan contribution, the credit is generally computed across <b>all</b> hours the
+  worker works — private jobs included — not just the prevailing-wage hours.</p>
+  <p>Say you pay $6,000 a year for a worker's health cover and they work 2,000 hours total, of which 500 are on
+  public work. The hourly credit is <code>6,000 ÷ 2,000 = $3.00</code>, not <code>6,000 ÷ 500 = $12.00</code>.
+  Claiming $12.00 overstates your fringe credit by $9.00 an hour and turns a compliant payroll into a
+  substantial underpayment.</p>
+  <div class="note">Contributions to <b>defined-contribution pension plans</b> must generally be made
+  irrevocably and no less often than quarterly to count. Money you intend to contribute later is not a credit
+  today.</div>
+
+  <h2 id="split">Workers on more than one job</h2>
+  <p>Overtime is owed on all hours worked for you in the week, not per project. A worker with 30 hours on your
+  federal job and 20 on a private one has worked 50 hours and is owed 10 hours of premium — even though
+  neither job alone crossed 40.</p>
+  <p>Allocate the premium to each project in proportion to hours worked there. In that example, 30/50 of the
+  overtime — 6 hours — is attributable to the federal project and appears on its certified payroll. Keep both
+  jobs' time records together; this is exactly the kind of thing an auditor asks to see.</p>
+
+  <h2 id="state">Where state law changes the answer</h2>
+  <p>Federal Davis-Bacon uses the weekly 40-hour rule. Several states layer their own rules on top for
+  state-funded work, and where both apply you follow whichever is more generous to the worker.</p>
+  <table>
+    <tr><th>State</th><th>Additional overtime rule</th></tr>
+    <tr><td>California</td><td>Over 8 hrs/day at 1.5×, over 12 at 2×, 7th consecutive day at 1.5× then 2× beyond 8</td></tr>
+    <tr><td>Alaska</td><td>Over 8 hrs/day at 1.5× on public works</td></tr>
+    <tr><td>Nevada</td><td>Over 8 hrs in a 24-hour period at 1.5× for many workers</td></tr>
+    <tr><td>Washington</td><td>Weekly 40-hour rule, but check the applicable scope of work</td></tr>
+  </table>
+  <p>California is the one that catches people out. A four-day, ten-hour schedule totals exactly 40 hours and
+  generates zero federal overtime — but eight hours of daily overtime under California law. Payroll software
+  built only for the federal rule reports that week as clean.</p>
+
+  <div class="cta">
+    <h3>Stop doing this in your head</h3>
+    <p>CertPay applies the right rule for your jurisdiction, checks every worker against the determination, and
+    tells you the exact shortfall before you sign. Free for up to five workers.</p>
+    <a class="btn" href="/app/">Open CertPay</a>
+  </div>
+
+  <h2 id="faq">Common questions</h2>
+  <h3>Can I count a worker's health insurance toward the fringe?</h3>
+  <p>Yes, if it is a bona fide plan and you annualise the credit across all hours worked. Keep the invoices.</p>
+
+  <h3>Do apprentices get the full journeyman package?</h3>
+  <p>Only if they are registered in a bona fide apprenticeship programme, in which case they may be paid the
+  programme's percentage of the journeyman rate. An unregistered "apprentice" is owed the full journeyman rate
+  for the classification of work performed — a common and expensive finding.</p>
+
+  <h3>What if the determination is modified mid-project?</h3>
+  <p>Generally the determination in effect at contract award governs for the life of the contract. On
+  contracts with option periods or substantial modifications the answer can differ, so confirm with the
+  contracting officer in writing rather than guessing.</p>
+
+  <h3>Is the fringe owed on overtime hours at all?</h3>
+  <p>Yes — on every hour worked. It is simply not multiplied by 1.5. Omitting fringe on overtime hours is an
+  underpayment.</p>
+
+  <h3>What are the consequences of getting it wrong?</h3>
+  <p>Back wages plus interest, withheld contract payments, civil penalties, and for wilful or repeated
+  violations, debarment from federal contracting for up to three years.</p>
+
+  <p style="font-size:15px;color:var(--mut);margin-top:36px">Related:
+  <a href="/guides/how-to-fill-out-wh-347/">how to fill out Form WH-347</a> ·
+  <a href="/guides/california-a-1-131-certified-payroll/">California A-1-131 and daily overtime</a>.</p>
+</div></article>
+
+<footer><div class="wrap">
+  <p style="max-width:76ch">CertPay is a form-preparation and validation tool, not legal, tax or payroll advice,
+  and is not affiliated with or endorsed by the U.S. Department of Labor. Verify all rates against your wage
+  determination and confirm interpretation with your contracting agency.</p>
+  <p>© 2026 CertPay · <a href="/">Home</a> · <a href="/guides/">Guides</a> · <a href="/app/">App</a> · <a href="/privacy/">Privacy</a></p>
+</div></footer>
+</body>
+</html>
