@@ -25,7 +25,7 @@ Then at https://dash.cloudflare.com → Workers & Pages → Create → Pages →
 | Build output directory | `/` |
 | Framework preset | None |
 
-You get `certpay.net` immediately, with HTTPS. That is enough to launch.
+You get `certpay.pages.dev` immediately, with HTTPS. That is enough to launch.
 
 ### Netlify alternative
 
@@ -66,7 +66,7 @@ Then on the live URL, by hand:
 Stripe takes 2.9% + 30¢ on actual revenue and nothing otherwise.
 
 1. Create a Stripe account.
-2. Products → add **CertPay Pro**, recurring, **$29/month**. Add a **$290/year** price too.
+2. Products → add **CertPay Pro**, recurring, **$49/month**. Add a **$490/year** price too.
 3. Payment Links → create a link for the monthly price.
 4. Under "After payment" → redirect to `https://certpay.net/app/?upgraded=1`.
 5. Paste the link into `app/app.js`:
@@ -79,7 +79,7 @@ const Pay = {
 That is the whole integration. The app sets a `localStorage` flag on return and unlocks.
 
 > **Yes, that is bypassable.** Someone could set the flag by hand. Ship it anyway — anyone
-> willing to edit `localStorage` to dodge $29 was never going to pay you. Licence-key
+> willing to edit `localStorage` to dodge $49 was never going to pay you. Licence-key
 > validation is a problem worth solving at 50 paying customers, not at zero. There is
 > already a `Pay.enterKey()` stub for when you want to issue keys manually.
 

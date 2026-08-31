@@ -28,7 +28,7 @@ Certified payroll is different:
 |---|---|
 | Filed **weekly, per project**, by every contractor and sub on a covered job | Recurring, habit-forming, low churn |
 | DOL estimates **~55 min per report** by hand | Real pain, measurable in hours |
-| Automation tools start at **$300–$1,200/month** | Enormous price umbrella |
+| Cheapest dedicated tool is **$49/mo + $5/report**; enterprise runs **$300–$1,200/mo** | Room to undercut on a flat rate |
 | QuickBooks Payroll and Gusto **don't produce it at all** | No incumbent owns the small end |
 | Penalties ~**$13,500 per violation**; California **$100/worker/day** | Fear-driven purchase |
 | Due within 7 days of the pay date | Deadline urgency closes sales |
@@ -132,16 +132,24 @@ Both green. `e2e.js` fails the build on any console error.
 
 | Plan | Price | Unlock |
 |---|---|---|
-| Free | $0 | 5 workers, 1 project, watermarked |
-| Pro | **$29/mo** or $290/yr | Unlimited workers and projects, no watermark, CSV export |
-| Firm | **$79/mo** | Multiple companies — for bookkeepers filing for clients |
+| Free | $0 | 15 workers, 1 project, watermarked |
+| Pro | **$49/mo** or $490/yr | Unlimited workers and projects, no watermark, CSV export |
+| Firm | **$149/mo** | Unlimited client companies — for bookkeepers filing for contractors |
 
-$29 is deliberate. Below $9 reads as unserious for a compliance product, and you need
-headroom for the Firm tier, which is where the real money is: one bookkeeper serving eight
-construction clients is worth more than eight individual contractors.
+$49 matches the cheapest dedicated competitor's *base* price while dropping their $5-per-report fee,
+so a weekly filer pays $49 where they would pay ~$69–$89. Flat rate — no per-report or per-worker charge,
+which is the differentiator worth advertising, since certified payroll is filed weekly.
+
+Going lower is a trap: below roughly $15 a compliance product reads as unserious, and you
+need headroom for the Firm tier, which is where the real money is. One bookkeeper serving
+eight construction clients is worth more than eight individual contractors.
+
+The free tier is generous on crew size (15 workers covers the entire target customer) on
+purpose. The watermark, not the worker cap, is what makes free output unusable for a real
+filing — so capping crew only blocks evaluation, while the watermark converts.
 
 Payment is a Stripe Payment Link plus a `localStorage` flag — see `DEPLOY.md` step 3. It is
-bypassable on purpose. Anyone who would edit `localStorage` to dodge $29 was never a
+bypassable on purpose. Anyone who would edit `localStorage` to dodge $49 was never a
 customer, and licence validation is a problem for 50 paying users, not zero.
 
 ---

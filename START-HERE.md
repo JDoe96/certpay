@@ -54,21 +54,38 @@ edit the file → GitHub Desktop → type a short message → **Commit to main**
 
 You said Cloudflare currently just has the domain. Now we connect the site.
 
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
-   **Connect to Git**.
-2. Authorise GitHub, pick your `certpay` repository.
-3. Build settings — this trips people up, so read carefully:
+> ### Read this before you click anything
+> Cloudflare merged the **Workers** and **Pages** dashboards, and the two flows sit right
+> next to each other. You want **Pages**. If at any point you see a field called
+> **"Deploy command"** containing `npx wrangler deploy`, you are in the **Workers** flow and
+> the deploy will fail. Pages has no such field. See `FIX-CLOUDFLARE.md`.
+
+1. Cloudflare dashboard → **Workers & Pages** → **Create application**.
+2. **Click the `Pages` tab** at the top of that screen — this is the step people miss —
+   then **Connect to Git**.
+
+   Shortcut if the tabs are hard to find, paste into your browser:
+   `https://dash.cloudflare.com/?to=/:account/pages/new/provider/github`
+3. Authorise GitHub, pick your `certpay` repository, **Begin setup**.
+4. Build settings — this trips people up, so read carefully:
 
    | Field | What to enter |
    |---|---|
+   | Project name | `certpay` |
+   | Production branch | `main` |
    | Framework preset | **None** |
    | Build command | **leave completely empty** |
    | Build output directory | `/` |
 
    There is no build step. It is plain HTML. If you put anything in "build command" the
-   deploy will fail.
+   deploy will fail. There should be **no "Deploy command" field on this screen** — if there
+   is, go back and click the **Pages** tab.
+
+   If you get **"Connection blocked"**, it is almost always your browser blocking
+   Cloudflare's GitHub popup. Allow popups for `dash.cloudflare.com`, disable ad blockers /
+   VPN, or try an incognito window. Full troubleshooting in `FIX-CLOUDFLARE.md`.
 4. **Save and Deploy**. Takes about a minute.
-5. You'll get a `certpay.net` URL. Open it — the CertPay site should load.
+5. You'll get a `something.pages.dev` URL. Open it — the CertPay site should load.
 6. Now attach your domain: in the Pages project → **Custom domains** → **Set up a custom
    domain** → type your domain → follow the prompts.
 

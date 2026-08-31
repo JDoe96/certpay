@@ -5,7 +5,10 @@
 'use strict';
 const { DAYS, num, r2, money, hrs, calcLine, calcTotals, validate, errorCount } = Engine;
 
-const CONFIG = { freeMaxWorkers: 5, freeMaxProjects: 1, watermark: true, pro: false };
+// Free tier is deliberately generous on crew size: the watermark is what makes
+// free output unusable for a real filing, so capping workers only blocks
+// evaluation. 15 covers the whole target customer (small subs run 8-14).
+const CONFIG = { freeMaxWorkers: 15, freeMaxProjects: 1, watermark: true, pro: false };
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const esc = s => (s ?? '').toString().replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -92,28 +95,110 @@ const Store = {
 
 /* ------------------------------------------------------------------- pay */
 const Pay = {
-  CHECKOUT_URL: 'https://buy.stripe.com/aFa8wO9cSfFLgkp7bwfQI00',                       // ← paste your Stripe Payment Link here
+  CHECKOUT_URL: '',                       // ← paste your Stripe Payment Link here
+  VERIFY_URL: '/api/verify',
+  GRACE_DAYS: 7,                          // keep working offline for a week between checks
+
   init() {
     const q = new URLSearchParams(location.search);
-    if (q.get('upgraded') === '1') { localStorage.setItem('certpay.pro','1'); history.replaceState({},'',location.pathname); UI.toast('Pro unlocked — thank you'); }
-    CONFIG.pro = localStorage.getItem('certpay.pro') === '1';
+    // Stripe sends the customer back with the subscription id in the URL.
+    const fromStripe = q.get('key') || q.get('subscription_id');
+    if (fromStripe) {
+      history.replaceState({}, '', location.pathname);
+      Pay.activate(fromStripe, true);
+      return;
+    }
+    Pay.restore();
   },
+
+  /* Read the cached licence. Valid until `until`, then we re-verify —
+     but only when there is a network, so offline use never breaks. */
+  restore() {
+    try {
+      const lic = JSON.parse(localStorage.getItem('certpay.licence') || 'null');
+      if (!lic || !lic.key) { CONFIG.pro = false; return; }
+      CONFIG.pro = true;                                   // trust the cache first
+      if (Date.now() > (lic.until || 0) && navigator.onLine) {
+        Pay.verify(lic.key).then(r => {
+          if (r.ok) {
+            localStorage.setItem('certpay.licence', JSON.stringify({ key: lic.key, until: r.until }));
+          } else if (r.reason !== 'offline' && r.reason !== 'not_configured') {
+            // Subscription genuinely cancelled or lapsed.
+            localStorage.removeItem('certpay.licence');
+            CONFIG.pro = false; UI.renderAll();
+            UI.toast('Subscription is no longer active');
+          }
+        });
+      }
+    } catch (e) { CONFIG.pro = false; }
+  },
+
+  async verify(key) {
+    try {
+      const res = await fetch(Pay.VERIFY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key })
+      });
+      if (!res.ok && res.status !== 200) return { ok: false, reason: 'http_' + res.status };
+      return await res.json();
+    } catch (e) {
+      return { ok: false, reason: 'offline' };
+    }
+  },
+
+  async activate(key, silent) {
+    key = String(key || '').trim();
+    if (!key) return;
+    UI.toast('Checking licence…');
+    const r = await Pay.verify(key);
+
+    if (r.ok) {
+      localStorage.setItem('certpay.licence', JSON.stringify({
+        key, until: r.until || Date.now() + Pay.GRACE_DAYS * 864e5
+      }));
+      CONFIG.pro = true;
+      const dlg = $('upgradeDlg'); if (dlg.open) dlg.close();
+      UI.renderAll();
+      UI.toast('Pro unlocked — thank you');
+      return true;
+    }
+
+    if (r.reason === 'offline') {
+      UI.toast('No connection — try again when you are online');
+    } else if (r.reason === 'not_configured') {
+      UI.toast('Licensing is not switched on yet');
+    } else if (r.reason === 'malformed') {
+      alert('That does not look like a CertPay licence key.\n\nIt should start with "sub_" and appears on your Stripe receipt.');
+    } else {
+      alert('That licence could not be verified (' + r.reason + ').\n\nIf you have just subscribed, wait a moment and try again, or email info@certpay.net.');
+    }
+    return false;
+  },
+
   open() { $('upgradeDlg').showModal(); },
+
   checkout() {
     if (!Pay.CHECKOUT_URL) {
-      alert('Checkout is not wired up yet.\n\nAdd your Stripe Payment Link to Pay.CHECKOUT_URL in app/app.js.\nSee DEPLOY.md, step 4.');
+      alert('Checkout is not wired up yet.\n\nAdd your Stripe Payment Link to Pay.CHECKOUT_URL in app/app.js.\nSee MONEY-SETUP.md.');
       return;
     }
     location.href = Pay.CHECKOUT_URL;
   },
+
   enterKey() {
-    const k = prompt('Enter your licence key:');
-    if (!k) return;
-    if (k.trim().toUpperCase().startsWith('CP-')) {
-      localStorage.setItem('certpay.pro','1'); CONFIG.pro = true;
-      $('upgradeDlg').close(); UI.renderAll(); UI.toast('Pro unlocked');
-    } else alert('That key was not recognised.');
-  }
+    const k = prompt('Enter your licence key.\n\nIt starts with "sub_" and is on your Stripe receipt:');
+    if (k) Pay.activate(k);
+  },
+
+  manage() {
+    if (!Pay.PORTAL_URL) {
+      alert('To cancel or change your card, use the link on your Stripe receipt, or email info@certpay.net.');
+      return;
+    }
+    location.href = Pay.PORTAL_URL;
+  },
+  PORTAL_URL: ''                          // ← optional Stripe customer portal link
 };
 
 /* -------------------------------------------------------------- app verbs */
@@ -305,7 +390,7 @@ const UI = {
 
     $('ssnNote').innerHTML = CA()
       ? '<b>California requires the employee address</b> on Form A-1-131, unlike the federal form. On copies provided to the public the DIR requires the name, address and SSN to be redacted — but the copy you file with the awarding body or Labor Commissioner is unredacted. CertPay stores only the last four digits, which is what prints.'
-      : '<b>Identifying number:</b> since 2009 the DOL requires only the <b>last four digits of the SSN</b> on submitted payrolls, never the full number. Keep full SSNs in your own records only.';
+      : '<b>Identifying number:</b> since January 2009 the WH-347 asks for an <b>individual identifying number</b>, not a full SSN. The <b>last four digits</b> are the usual choice, but an employee or badge number is equally valid — just use the same one for that worker every week. The DOL is explicit that full Social Security numbers must not appear on submitted payrolls. You still keep the full SSN and home address in your own records, where they must be available for inspection.';
 
     $('hoursSub').textContent = CA()
       ? 'Site hours only. Daily overtime over 8 hours, double time over 12, and the seventh consecutive day are all calculated automatically.'
@@ -357,7 +442,7 @@ const UI = {
     $('crewLock').innerHTML = (!CONFIG.pro && p.lines.length >= CONFIG.freeMaxWorkers)
       ? `<div class="lock" style="margin-bottom:15px"><div><b>Free plan limit reached — ${CONFIG.freeMaxWorkers} workers.</b><br>
          Upgrade for unlimited crew, no watermark, unlimited projects and CSV export.</div>
-         <button class="btn" style="margin-left:auto" onclick="Pay.open()">Upgrade — $29/mo</button></div>` : '';
+         <button class="btn" style="margin-left:auto" onclick="Pay.open()">Upgrade — $49/mo</button></div>` : '';
 
     const t = $('crewTbl');
     if (!p.lines.length) { t.innerHTML = `<tr><td><div class="empty">No workers yet.<br>Add everyone who performed manual labour on the site this week.</div></td></tr>`; return; }

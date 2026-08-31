@@ -1,0 +1,105 @@
+name: Checks
+
+# Runs automatically on every push, and every Monday morning.
+# You do not start this. It tells you if something broke.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 13 * * 1'      # Mondays 13:00 UTC (~8am Eastern)
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Engine and browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Engine tests
+        run: node test.js
+
+      - name: Licence endpoint tests
+        run: node functions/api/verify.test.mjs
+
+      - name: Install browser
+        run: |
+          npm i -D playwright@1.47.2 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Serve the site
+        run: |
+          python3 -m http.server 3000 --bind 127.0.0.1 &
+          sleep 3
+
+      - name: Browser tests
+        run: node e2e.js
+        env:
+          BASE: http://127.0.0.1:3000
+
+  live-site:
+    name: Live site health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only meaningful once the site is deployed
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every page and asset responds
+        run: |
+          FAIL=0
+          for U in / /app/ /guides/ /privacy/ \
+                   /guides/how-to-fill-out-wh-347/ \
+                   /guides/certified-payroll-overtime-fringe-benefits/ \
+                   /guides/california-a-1-131-certified-payroll/ \
+                   /site.css /app/app.css /app/app.js /app/engine.js \
+                   /app/manifest.webmanifest /app/sw.js \
+                   /robots.txt /sitemap.xml /.well-known/assetlinks.json \
+                   /icons/icon-192.png /icons/icon-512.png; do
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://certpay.net$U" || echo 000)
+            if [ "$CODE" != "200" ]; then
+              echo "::error::https://certpay.net$U returned $CODE"
+              FAIL=1
+            else
+              echo "ok   $U"
+            fi
+          done
+          exit $FAIL
+
+      - name: Licence endpoint is alive
+        run: |
+          BODY=$(curl -s -X POST https://certpay.net/api/verify \
+            -H 'Content-Type: application/json' -d '{"key":"sub_healthcheck"}')
+          echo "response: $BODY"
+          case "$BODY" in
+            *not_configured*)
+              echo "::warning::Licence verification is not configured — STRIPE_SECRET_KEY missing. Customers cannot activate Pro. See MONEY-SETUP.md step 5." ;;
+            *not_found*|*malformed*)
+              echo "Licence endpoint healthy." ;;
+            *)
+              echo "::error::Unexpected response from /api/verify"; exit 1 ;;
+          esac
+
+      - name: TLS certificate has time left
+        run: |
+          DAYS=$(( ( $(date -d "$(echo | openssl s_client -servername certpay.net -connect certpay.net:443 2>/dev/null \
+                 | openssl x509 -noout -enddate | cut -d= -f2)" +%s) - $(date +%s) ) / 86400 ))
+          echo "certificate expires in $DAYS days"
+          if [ "$DAYS" -lt 14 ]; then echo "::error::TLS certificate expires in $DAYS days"; exit 1; fi
+
+      - name: No stale placeholder text
+        run: |
+          HTML=$(curl -s https://certpay.net/)
+          for BAD in "certpay.app" "hello@certpay" "YOURDOMAIN" "REPLACE_WITH"; do
+            if echo "$HTML" | grep -q "$BAD"; then
+              echo "::error::Live homepage still contains placeholder: $BAD"; exit 1
+            fi
+          done
+          echo "no placeholders found"

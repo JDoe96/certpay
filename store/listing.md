@@ -34,7 +34,8 @@ The Department of Labor estimates it takes about 55 minutes per report by hand. 
 software that automates it starts at $300–$1,200 a month, and QuickBooks Payroll and Gusto
 don't produce the form at all.
 
-CertPay is free for up to five workers, and $29 a month after that.
+CertPay is free for up to fifteen workers, and a flat $49 a month after that — no per-worker
+or per-report charges.
 
 
 IT CHECKS THE MATHS, NOT JUST THE FORMAT
@@ -101,9 +102,9 @@ FEATURES
 
 PRICING
 
-Free — up to 5 workers, one project, watermarked printout
-Pro, $29/month — unlimited workers and projects, no watermark, CSV export
-Firm, $79/month — multiple companies, for bookkeepers filing on behalf of clients
+Free — up to 15 workers, one project, watermarked printout
+Pro, $49/month — unlimited workers and projects, no watermark, CSV export
+Firm, $149/month — unlimited client companies, for bookkeepers filing on behalf of contractors
 
 
 CertPay is a form-preparation and validation tool. It is not legal, tax or payroll advice,
@@ -120,7 +121,7 @@ sign and submit.
 - **Tags:** construction, payroll, compliance, contractors, prevailing wage
 - **Content rating:** Everyone
 - **Ads:** No
-- **In-app purchases:** Yes ($29–$79) — if billing runs through your own Stripe checkout
+- **In-app purchases:** Yes ($49–$149) — if billing runs through your own Stripe checkout
   on the web rather than Play Billing, declare it accurately and be aware Google requires
   Play Billing for digital goods sold *inside* the app. The safe pattern for a TWA is to
   keep upgrade purchases on the website and not surface a purchase button in the Android

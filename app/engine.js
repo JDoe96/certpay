@@ -189,9 +189,12 @@ function validate(ctx) {
     const who = String(p.name || '').trim() || 'Unnamed worker';
 
     if (!String(p.name || '').trim()) E('Worker name missing', 'Every payroll line needs a named worker.');
-    if (!String(p.ssn4 || '').trim()) W(who + ' — no identifying number', 'Use the last 4 digits of the SSN.');
+    if (!String(p.ssn4 || '').trim())
+      W(who + ' — no identifying number',
+        'Each worker needs an individual identifying number. The last 4 digits of the SSN is the usual choice, but an employee or badge number works too.');
     if (String(p.ssn4 || '').replace(/\D/g, '').length > 4)
-      E(who + ' — full SSN entered', 'Federal WH-347 submissions must show only the last 4 digits. Remove the rest before filing.');
+      E(who + ' — full SSN on the payroll',
+        'The DOL requires that full Social Security numbers are not included on submitted payrolls. Use the last 4 digits, or an employee ID. Keep the full SSN in your own records only.');
     if (ca && !String(p.addr || '').trim())
       W(who + ' — address missing', 'Form A-1-131 requires the employee address, unlike the federal WH-347.');
     if (!l.classId) E(who + ' — no work classification', 'Assign the classification from your wage determination.');
