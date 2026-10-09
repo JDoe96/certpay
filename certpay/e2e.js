@@ -138,12 +138,12 @@ const sec = s => console.log('\n\x1b[1m' + s + '\x1b[0m');
 
   sec('App — free plan limits');
   await page.click('button[data-t="crew"]');
-  for (let i = 0; i < 4; i++) { await page.click('text=+ Add worker'); await page.waitForTimeout(90); }
-  eqs('5 workers allowed', await page.locator('#crewTbl tbody tr').count(), 5);
+  for (let i = 0; i < 14; i++) { await page.click('text=+ Add worker'); await page.waitForTimeout(60); }
+  eqs('15 workers allowed', await page.locator('#crewTbl tbody tr').count(), 15);
   ok('limit banner shown', (await page.locator('#crewLock').innerText()).includes('limit reached'));
   await page.click('text=+ Add worker');
   await page.waitForTimeout(200);
-  ok('6th worker opens upgrade dialog', await page.locator('#upgradeDlg[open]').count() === 1);
+  ok('16th worker opens upgrade dialog', await page.locator('#upgradeDlg[open]').count() === 1);
   await page.evaluate(() => document.getElementById('upgradeDlg').close());
 
   sec('App — California engine');
@@ -192,7 +192,7 @@ const sec = s => console.log('\n\x1b[1m' + s + '\x1b[0m');
   ok('federal has 2 sheets', (fedHTML.match(/class="sheet/g) || []).length === 2);
 
   sec('App — multi-project');
-  await page.evaluate(() => { localStorage.setItem('certpay.pro','1'); });
+  await page.evaluate(() => { localStorage.setItem('certpay.licence', JSON.stringify({ key: 'sub_test', until: Date.now() + 864e5 })); });
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(300);
   eqs('pro badge active', (await page.locator('#planTag').innerText()).trim(), 'PRO');
