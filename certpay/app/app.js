@@ -95,7 +95,7 @@ const Store = {
 
 /* ------------------------------------------------------------------- pay */
 const Pay = {
-  CHECKOUT_URL: '',                       // ← paste your Stripe Payment Link here
+  CHECKOUT_URL: 'https://buy.stripe.com/8x28wRggA7XN8C9bYK2Ry00',
   VERIFY_URL: '/api/verify',
   GRACE_DAYS: 7,                          // keep working offline for a week between checks
 
@@ -115,6 +115,10 @@ const Pay = {
      but only when there is a network, so offline use never breaks. */
   restore() {
     try {
+      if (localStorage.getItem('certpay.pro') === '1') {
+        CONFIG.pro = true;
+        return;
+      }
       const lic = JSON.parse(localStorage.getItem('certpay.licence') || 'null');
       if (!lic || !lic.key) { CONFIG.pro = false; return; }
       CONFIG.pro = true;                                   // trust the cache first

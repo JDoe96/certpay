@@ -192,7 +192,10 @@ const sec = s => console.log('\n\x1b[1m' + s + '\x1b[0m');
   ok('federal has 2 sheets', (fedHTML.match(/class="sheet/g) || []).length === 2);
 
   sec('App — multi-project');
-  await page.evaluate(() => { localStorage.setItem('certpay.licence', JSON.stringify({ key: 'sub_test', until: Date.now() + 864e5 })); });
+  await page.evaluate(() => {
+    localStorage.setItem('certpay.pro', '1');
+    localStorage.setItem('certpay.licence', JSON.stringify({ key: 'sub_test', until: Date.now() + 864e5 }));
+  });
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(300);
   eqs('pro badge active', (await page.locator('#planTag').innerText()).trim(), 'PRO');
