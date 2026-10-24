@@ -215,13 +215,22 @@
 <dialog id="upgradeDlg"><div class="dlg">
   <h3>Upgrade to CertPay Pro</h3>
   <p style="color:var(--mut);font-size:14px;margin:6px 0 16px">Unlimited crew, no watermark, unlimited projects, CSV export and state forms.</p>
-  <div style="background:#f5f7f9;border-radius:10px;padding:14px;font-size:14px;line-height:1.9;margin-bottom:16px">
-    <b style="font-size:20px">$49</b> / month &nbsp;·&nbsp; or $490 / year<br>
-    <span style="color:var(--mut)">Flat rate — no per-worker or per-report charges. Cancel anytime.</span>
+  <div style="background:#f5f7f9;border-radius:10px;padding:14px;font-size:14px;line-height:1.7;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div><b>Pro Monthly</b><br><span style="color:var(--mut);font-size:13px">$49 / month</span></div>
+      <button class="btn sm" onclick="Pay.checkout('pro_monthly')">Get Monthly — $49</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #e2e8f0;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div><b>Pro Yearly <span style="color:#16a34a;font-size:12px;font-weight:700">(Save 17%)</span></b><br><span style="color:var(--mut);font-size:13px">$490 / year (2 months free)</span></div>
+      <button class="btn sm" onclick="Pay.checkout('pro_yearly')">Get Yearly — $490</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #e2e8f0;flex-wrap:wrap;gap:8px">
+      <div><b>Firm Plan</b><br><span style="color:var(--mut);font-size:13px">For multi-company bookkeepers ($149/mo)</span></div>
+      <button class="btn sm gh" onclick="Pay.checkout('firm_monthly')">Firm — $149/mo</button>
+    </div>
   </div>
   <div class="row">
-    <button class="btn" onclick="Pay.checkout()">Continue to payment</button>
-    <button class="btn sec" onclick="document.getElementById('upgradeDlg').close()">Not now</button>
+    <button class="btn sec" style="width:100%" onclick="document.getElementById('upgradeDlg').close()">Close</button>
   </div>
   <div class="note" style="margin-top:14px">Have a licence key? <a href="#" onclick="Pay.enterKey();return false">Enter it here</a>.</div>
 </div></dialog>

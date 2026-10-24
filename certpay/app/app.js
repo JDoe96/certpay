@@ -96,6 +96,12 @@ const Store = {
 /* ------------------------------------------------------------------- pay */
 const Pay = {
   CHECKOUT_URL: 'https://buy.stripe.com/8x28wRggA7XN8C9bYK2Ry00',
+  LINKS: {
+    pro_monthly:  'https://buy.stripe.com/8x28wRggA7XN8C9bYK2Ry00',
+    pro_yearly:   'https://buy.stripe.com/28E7sNc0k0vl3hP9QC2Ry01',
+    firm_monthly: 'https://buy.stripe.com/eVq00l0hCb9Z2dL2oa2Ry02',
+    firm_yearly:  'https://buy.stripe.com/dRmdRbaWgfqf4lT5Am2Ry03'
+  },
   VERIFY_URL: '/api/verify',
   GRACE_DAYS: 7,                          // keep working offline for a week between checks
 
@@ -182,12 +188,13 @@ const Pay = {
 
   open() { $('upgradeDlg').showModal(); },
 
-  checkout() {
-    if (!Pay.CHECKOUT_URL) {
+  checkout(plan = 'pro_monthly') {
+    const url = Pay.LINKS?.[plan] || Pay.CHECKOUT_URL;
+    if (!url) {
       alert('Checkout is not wired up yet.\n\nAdd your Stripe Payment Link to Pay.CHECKOUT_URL in app/app.js.\nSee MONEY-SETUP.md.');
       return;
     }
-    location.href = Pay.CHECKOUT_URL;
+    location.href = url;
   },
 
   enterKey() {
