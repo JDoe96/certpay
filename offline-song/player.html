@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Bad Habit — Country Lunatic (Offline Player)</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background: #14110d; color: #f3ead9;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 20px;
+  }
+  .card {
+    width: min(520px, 100%); background: #1f1a14; border: 1px solid #3a3125;
+    border-radius: 18px; padding: 28px 24px; text-align: center;
+    box-shadow: 0 18px 50px rgba(0,0,0,.5);
+  }
+  .disc { font-size: 72px; line-height: 1; margin-bottom: 10px; }
+  h1 { margin: 6px 0 2px; font-size: 26px; }
+  .artist { color: #c9a86a; font-size: 17px; margin: 0 0 4px; }
+  .meta { color: #9b8f78; font-size: 13px; margin: 0 0 18px; }
+  #status { font-size: 14px; color: #c9bda3; min-height: 20px; margin: 10px 0; }
+  #playBtn {
+    width: 84px; height: 84px; border-radius: 50%; border: 0; cursor: pointer;
+    background: #c9a86a; color: #1c160e; font-size: 34px; margin: 8px 0 14px;
+  }
+  #playBtn:disabled { opacity: .35; cursor: not-allowed; }
+  .row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .row label { font-size: 12px; color: #9b8f78; width: 52px; text-align: left; }
+  input[type="range"] { flex: 1; accent-color: #c9a86a; }
+  .time { font-variant-numeric: tabular-nums; font-size: 13px; color: #c9bda3; width: 86px; }
+  .btns { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .btns button, .pick {
+    background: #2c251a; color: #f3ead9; border: 1px solid #4a3f2c;
+    border-radius: 10px; padding: 10px 14px; cursor: pointer; font-size: 14px;
+  }
+  .btns button[aria-pressed="true"] { background: #c9a86a; color: #1c160e; }
+  #drop {
+    border: 2px dashed #4a3f2c; border-radius: 12px; padding: 16px; margin-top: 16px;
+    color: #c9bda3; font-size: 14px;
+  }
+  #drop.over { border-color: #c9a86a; color: #f3ead9; }
+  .help { text-align: left; font-size: 13px; color: #9b8f78; margin-top: 18px; line-height: 1.55; }
+  a { color: #c9a86a; }
+  code { background: #2c251a; padding: 1px 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="disc" aria-hidden="true">🎵</div>
+    <h1>My Bad Habit</h1>
+    <p class="artist">Country Lunatic</p>
+    <p class="meta">5:06 · Offline player — works with no internet once the audio file is in this folder</p>
+
+    <audio id="audio" preload="metadata"></audio>
+    <button id="playBtn" disabled aria-label="Play or pause">▶</button>
+    <div id="status">Looking for the song file in this folder…</div>
+
+    <div class="row">
+      <label for="seek">Seek</label>
+      <input id="seek" type="range" min="0" max="1000" value="0">
+      <span class="time"><span id="cur">0:00</span> / <span id="dur">0:00</span></span>
+    </div>
+    <div class="row">
+      <label for="vol">Volume</label>
+      <input id="vol" type="range" min="0" max="100" value="90">
+      <span class="time" id="volPct">90%</span>
+    </div>
+
+    <div class="btns">
+      <button id="back10" type="button">⏮ −10s</button>
+      <button id="fwd10" type="button">+10s ⏭</button>
+      <button id="loopBtn" type="button" aria-pressed="false">🔁 Loop: off</button>
+      <label class="pick" for="filePick">📂 Choose audio file…</label>
+      <input id="filePick" type="file" accept="audio/*,.mp3,.m4a,.webm,.opus,.ogg,.wav" hidden>
+    </div>
+
+    <div id="drop">No song file yet? Drag &amp; drop the downloaded MP3/M4A here — or run the downloader below first.</div>
+
+    <div class="help">
+      <strong>Get the song into this folder (one time, needs internet):</strong>
+      <ol>
+        <li>Windows: double-click <code>download.bat</code> &nbsp;·&nbsp; Mac/Linux: run <code>./download.sh</code></li>
+        <li>That saves <code>Country Lunatic - My Bad Habit.mp3</code> (or <code>.m4a</code>) right here.</li>
+        <li>Reload this page and press ▶. After that it plays fully offline — airplane mode, no signal, anywhere.</li>
+      </ol>
+      Original video: <a href="https://www.youtube.com/watch?v=qkrAngr_KY0" target="_blank" rel="noopener">youtube.com/watch?v=qkrAngr_KY0</a><br>
+      © 2025 F.O.W.B Independent Records L.L.C. — for personal offline listening.
+    </div>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+  var audio = document.getElementById("audio");
+  var playBtn = document.getElementById("playBtn");
+  var status = document.getElementById("status");
+  var seek = document.getElementById("seek");
+  var vol = document.getElementById("vol");
+  var cur = document.getElementById("cur");
+  var dur = document.getElementById("dur");
+  var volPct = document.getElementById("volPct");
+  var loopBtn = document.getElementById("loopBtn");
+  var filePick = document.getElementById("filePick");
+  var drop = document.getElementById("drop");
+  var seeking = false;
+
+  // Same-folder candidates the downloader may have produced (relative = offline-safe).
+  var candidates = [
+    "Country Lunatic - My Bad Habit.mp3",
+    "Country Lunatic - My Bad Habit.m4a",
+    "Country Lunatic - My Bad Habit.webm",
+    "Country Lunatic - My Bad Habit.opus",
+    "Country Lunatic - My Bad Habit.ogg"
+  ];
+  var idx = 0;
+
+  function fmt(s) {
+    if (!isFinite(s) || s < 0) return "0:00";
+    var m = Math.floor(s / 60), r = Math.floor(s % 60);
+    return m + ":" + (r < 10 ? "0" : "") + r;
+  }
+  function ready(name) {
+    playBtn.disabled = false;
+    status.textContent = "Ready offline: " + name + " — press ▶";
+    drop.textContent = "Loaded: " + name + " · You can also drag a different audio file here anytime.";
+    if ("mediaSession" in navigator) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: "My Bad Habit", artist: "Country Lunatic", album: "Lunatic Nation"
+        });
+      } catch (e) { /* optional lock-screen info only */ }
+    }
+  }
+  function tryNext() {
+    if (idx >= candidates.length) {
+      status.textContent = "Song file not in this folder yet — run the downloader (see steps below) or pick/drop the file.";
+      return;
+    }
+    audio.src = encodeURI(candidates[idx]);
+    audio.load();
+  }
+  audio.addEventListener("error", function () {
+    if (audio.dataset.localFile === "1") {
+      status.textContent = "That file could not be played. Try an MP3 or M4A.";
+      return;
+    }
+    idx += 1;
+    tryNext();
+  });
+  audio.addEventListener("loadedmetadata", function () {
+    dur.textContent = fmt(audio.duration);
+    var name = audio.dataset.localFile === "1" ? (audio.dataset.fileName || "your file") : candidates[idx];
+    ready(name);
+  });
+  audio.addEventListener("timeupdate", function () {
+    cur.textContent = fmt(audio.currentTime);
+    if (!seeking && audio.duration) seek.value = String(Math.round(audio.currentTime / audio.duration * 1000));
+  });
+  audio.addEventListener("play", function () { playBtn.textContent = "⏸"; });
+  audio.addEventListener("pause", function () { playBtn.textContent = "▶"; });
+  audio.addEventListener("ended", function () { playBtn.textContent = "▶"; });
+
+  playBtn.addEventListener("click", function () {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  });
+  seek.addEventListener("input", function () { seeking = true; });
+  seek.addEventListener("change", function () {
+    if (audio.duration) audio.currentTime = Number(seek.value) / 1000 * audio.duration;
+    seeking = false;
+  });
+  function setVol() {
+    audio.volume = Number(vol.value) / 100;
+    volPct.textContent = vol.value + "%";
+  }
+  vol.addEventListener("input", setVol);
+  setVol();
+
+  document.getElementById("back10").addEventListener("click", function () {
+    audio.currentTime = Math.max(0, audio.currentTime - 10);
+  });
+  document.getElementById("fwd10").addEventListener("click", function () {
+    if (audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+  });
+  loopBtn.addEventListener("click", function () {
+    audio.loop = !audio.loop;
+    loopBtn.setAttribute("aria-pressed", String(audio.loop));
+    loopBtn.textContent = audio.loop ? "🔁 Loop: on" : "🔁 Loop: off";
+  });
+
+  function loadLocalFile(file) {
+    if (!file) return;
+    audio.dataset.localFile = "1";
+    audio.dataset.fileName = file.name;
+    audio.src = URL.createObjectURL(file);
+    audio.load();
+    audio.play().catch(function () { /* user can press play */ });
+  }
+  filePick.addEventListener("change", function () { loadLocalFile(filePick.files[0]); });
+  ["dragenter", "dragover"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (e) {
+    loadLocalFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+  });
+
+  tryNext();
+})();
+</script>
+</body>
+</html>
