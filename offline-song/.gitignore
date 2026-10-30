@@ -1,0 +1,12 @@
+# Downloaded audio is copyrighted material for personal offline use only.
+# Never commit it to the CertPay repository.
+*.mp3
+*.m4a
+*.webm
+*.opus
+*.ogg
+*.wav
+*.mp4
+*.part
+*.ytdl
+__pycache__/
