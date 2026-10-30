@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Offline Playlist — My Bad Habit + Catfish Billy 2</title>
+<title>Offline Playlist — My Bad Habit + Catfish Billy 2 + Club Husband</title>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
@@ -70,9 +70,9 @@
 <body>
   <main class="card">
     <div class="disc" aria-hidden="true">🎵</div>
-    <h1 id="nowTitle">Catfish Billy 2</h1>
-    <p class="artist" id="nowArtist">Yelawolf</p>
-    <p class="meta" id="nowMeta">Trunk Muzik 3 · 3:18 · Offline player — no internet needed once files are in this folder</p>
+    <h1 id="nowTitle">Club Husband</h1>
+    <p class="artist" id="nowArtist">T-Pain</p>
+    <p class="meta" id="nowMeta">Club Husband - Single · 3:39 · Offline player — no internet needed once files are in this folder</p>
 
     <div class="playlist" id="playlist" role="list" aria-label="Playlist"></div>
 
@@ -108,14 +108,15 @@
     <div class="help">
       <strong>Get the songs into this folder (one time, needs internet):</strong>
       <ol>
-        <li>Windows: double-click <code>download.bat</code> &nbsp;·&nbsp; Mac/Linux: run <code>./download.sh</code> — downloads <em>both</em> tracks (already-downloaded ones are skipped).</li>
-        <li>Only want one? <code>python3 download.py 2</code> = Catfish Billy 2 only · <code>python3 download.py 1</code> = My Bad Habit only.</li>
+        <li>Windows: double-click <code>download.bat</code> &nbsp;·&nbsp; Mac/Linux: run <code>./download.sh</code> — downloads <em>all three</em> tracks (already-downloaded ones are skipped).</li>
+        <li>Only want one? <code>python3 download.py 3</code> = Club Husband only · <code>python3 download.py 2</code> = Catfish Billy 2 only · <code>python3 download.py 1</code> = My Bad Habit only.</li>
         <li>Reload this page, tap a track, press ▶. After that everything plays fully offline — airplane mode, no signal, anywhere.</li>
       </ol>
       Sources:
+      <a href="https://www.youtube.com/watch?v=L_o25kYUe4g" target="_blank" rel="noopener">Club Husband (Official T-Pain audio)</a> ·
       <a href="https://www.youtube.com/watch?v=hnnVACOif1U" target="_blank" rel="noopener">Catfish Billy 2 (Official Yelawolf audio)</a> ·
       <a href="https://www.youtube.com/watch?v=qkrAngr_KY0" target="_blank" rel="noopener">My Bad Habit (Country Lunatic)</a><br>
-      For personal offline listening. Catfish Billy 2 ℗ 2019 Slumerican / Shady / Interscope · My Bad Habit © 2025 F.O.W.B Independent Records L.L.C.
+      For personal offline listening. Club Husband ℗ 2025 Nappy Boy Entertainment · Catfish Billy 2 ℗ 2019 Slumerican / Shady / Interscope · My Bad Habit © 2025 F.O.W.B Independent Records L.L.C.
     </div>
   </main>
 
@@ -132,10 +133,14 @@
     {
       title: "Catfish Billy 2", artist: "Yelawolf", album: "Trunk Muzik 3", length: "3:18",
       base: "Yelawolf - Catfish Billy 2"
+    },
+    {
+      title: "Club Husband", artist: "T-Pain", album: "Club Husband - Single", length: "3:39",
+      base: "T-Pain - Club Husband"
     }
   ];
   var EXTS = ["mp3", "m4a", "webm", "opus", "ogg"];
-  var DEFAULT_TRACK = 1; // Catfish Billy 2 (latest request)
+  var DEFAULT_TRACK = 2; // Club Husband (latest request)
 
   var audio = document.getElementById("audio");
   var playBtn = document.getElementById("playBtn");
@@ -378,7 +383,7 @@
     loadLocalFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
   });
 
-  // Boot: mark which tracks are already in the folder, select Catfish Billy 2
+  // Boot: mark which tracks are already in the folder, select Club Husband
   // (fall back to the first available track), but do not autoplay on page load.
   setHeader(TRACKS[DEFAULT_TRACK]);
   markCurrent();

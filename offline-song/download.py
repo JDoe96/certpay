@@ -5,15 +5,16 @@ Download songs for personal offline listening into this folder.
 Tracks:
   1. "My Bad Habit"    - Country Lunatic   (5:06)
   2. "Catfish Billy 2" - Yelawolf          (3:18, Trunk Muzik 3)
+  3. "Club Husband"    - T-Pain            (3:39, Club Husband - Single)
 
 Run this on YOUR OWN computer/phone (home Wi-Fi), not in a restricted
 cloud workspace -- it needs to be able to reach youtube.com.
 
 Usage:
     python3 download.py              # download every missing track
-    python3 download.py 2            # download only track 2
-    python3 download.py --only catfish
-    python3 download.py --only 1 2
+    python3 download.py 3            # download only track 3
+    python3 download.py --only club
+    python3 download.py --only 1 2 3
     python3 download.py --list       # show tracks + what is already here
     python3 download.py --check      # only check tools, download nothing
 
@@ -58,6 +59,17 @@ TRACKS = [
         # Official Yelawolf topic audio (provided to YouTube by EMPIRE).
         "url": "https://www.youtube.com/watch?v=hnnVACOif1U",
         "credit": "(p) 2019 Slumerican / Shady / Interscope",
+    },
+    {
+        "num": 3,
+        "slug": "club-husband",
+        "title": "Club Husband",
+        "artist": "T-Pain",
+        "album": "Club Husband - Single",
+        "length": "3:39",
+        # Official T-Pain topic audio (provided to YouTube by DistroKid).
+        "url": "https://www.youtube.com/watch?v=L_o25kYUe4g",
+        "credit": "(p) 2025 Nappy Boy Entertainment",
     },
 ]
 
@@ -186,9 +198,9 @@ def main() -> int:
         description="Download your offline songs into this folder (personal use)."
     )
     parser.add_argument("tracks", nargs="*", metavar="TRACK",
-                        help="optional: track number/name to get, e.g. 2 or catfish")
+                        help="optional: track number/name to get, e.g. 3 or club")
     parser.add_argument("--only", nargs="+", metavar="TRACK",
-                        help="same as positional TRACK, e.g. --only 1 2")
+                        help="same as positional TRACK, e.g. --only 1 2 3")
     parser.add_argument("--list", action="store_true",
                         help="list tracks and download status, then exit")
     parser.add_argument("--check", action="store_true",
@@ -206,8 +218,9 @@ def main() -> int:
     print_list()
 
     if unknown:
+        nums = ", ".join(str(t["num"]) for t in TRACKS)
         print(f"\nERROR: unknown track selector(s): {', '.join(map(str, unknown))}")
-        print("Use a track number (1, 2) or part of the name, e.g.:  python3 download.py 2")
+        print(f"Use a track number ({nums}) or part of the name, e.g.:  python3 download.py 3")
         return 2
     if args.list:
         return 0

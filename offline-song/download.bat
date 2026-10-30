@@ -1,7 +1,7 @@
 @echo off
-REM Double-click me on Windows to download your offline songs (both tracks; finished ones are skipped).
-REM Track 1: My Bad Habit - Country Lunatic   Track 2: Catfish Billy 2 - Yelawolf
-REM For just one track, open a terminal here and run:  python download.py 2
+REM Double-click me on Windows to download your offline songs (all 3 tracks; finished ones are skipped).
+REM Track 1: My Bad Habit - Country Lunatic   Track 2: Catfish Billy 2 - Yelawolf   Track 3: Club Husband - T-Pain
+REM For just one track, open a terminal here and run:  python download.py 3
 cd /d "%~dp0"
 where python >nul 2>nul
 if %errorlevel%==0 (

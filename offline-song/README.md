@@ -1,17 +1,28 @@
 # 🎵 Offline songs
 
-Two tracks, one folder, one player — all playable with **no internet** once downloaded:
+Three tracks, one folder, one player — all playable with **no internet** once downloaded:
 
 | # | Song | Length | Source |
 |---|---|---|---|
 | 1 | **My Bad Habit — Country Lunatic** | 5:06 | https://www.youtube.com/watch?v=qkrAngr_KY0 |
 | 2 | **Catfish Billy 2 — Yelawolf** (*Trunk Muzik 3*) | 3:18 | https://www.youtube.com/watch?v=hnnVACOif1U (Official Yelawolf topic audio, provided by EMPIRE) |
+| 3 | **Club Husband — T-Pain** (*Club Husband - Single*) | 3:39 | https://www.youtube.com/watch?v=L_o25kYUe4g (Official T-Pain topic audio, provided by DistroKid) |
 
 You have 3 ways to listen offline. Pick whichever is easiest — #1 needs no computer skills at all.
 
 ---
 
 ## Option 1 — Official apps (easiest, tap "Download" in the app)
+
+### Club Husband — T-Pain (℗ 2025 Nappy Boy Entertainment)
+| App | Link |
+|---|---|
+| T-Pain Official site (Spotify + Apple Music links) | https://tpain.com/music/club-husband/ |
+| Spotify (exact track) | https://open.spotify.com/track/6Wnr4kk9nZvkZ24QomLnaE |
+| Apple Music (exact track) | https://music.apple.com/us/song/club-husband/1843573690 |
+| Apple Music (single) | https://music.apple.com/us/album/club-husband-single/1843573689 |
+| YouTube (Official audio) | https://www.youtube.com/watch?v=L_o25kYUe4g |
+| YouTube Music (single) | https://music.youtube.com/playlist?list=OLAK5uy_m5dsnNtpWvhaKtkeHQFudU9asCNfGtXMg |
 
 ### Catfish Billy 2 — Yelawolf (℗ 2019 Slumerican / Shady / Interscope)
 | App | Link |
@@ -38,36 +49,39 @@ Run this **on your own computer/phone on home Wi-Fi** (not a work/school/cloud n
 
 ### Windows
 1. First time only: install Python free from https://www.python.org/downloads/ and tick **"Add python.exe to PATH"**.
-2. Double-click **`download.bat`** in this folder — it downloads **both** songs (anything already downloaded is skipped).
+2. Double-click **`download.bat`** in this folder — it downloads **all three** songs (anything already downloaded is skipped).
 3. Wait for `All done!` — you'll have:
    - `Country Lunatic - My Bad Habit.mp3` (or `.m4a`)
    - `Yelawolf - Catfish Billy 2.mp3` (or `.m4a`)
+   - `T-Pain - Club Husband.mp3` (or `.m4a`)
 
 ### Mac / Linux
 ```bash
 cd offline-song
 chmod +x download.sh
-./download.sh              # both tracks
-./download.sh 2            # only Catfish Billy 2
+./download.sh              # all three tracks
+./download.sh 3            # only Club Husband
 ./download.sh --list       # see what's already downloaded
 ```
 
 ### Just one track
 ```bash
+python3 download.py 3               # Club Husband only
 python3 download.py 2               # Catfish Billy 2 only
 python3 download.py 1               # My Bad Habit only
-python3 download.py --only catfish  # same thing, by name
+python3 download.py --only club     # same as 3, by name
+python3 download.py --only catfish  # same as 2, by name
 python3 download.py --check         # test your setup, download nothing
 ```
 
 ### Android phone (no computer)
 1. Install **Termux** (from F-Droid or Google Play).
 2. In Termux: `pkg install python ffmpeg -y`
-3. Copy this `offline-song` folder to the phone, `cd` into it, run: `python download.py` (add `2` for only Catfish Billy 2).
+3. Copy this `offline-song` folder to the phone, `cd` into it, run: `python download.py` (add `3` for only Club Husband).
 4. The audio files land in that folder — move them to your Music folder.
 
 ### Then play offline
-- **Easiest:** open **`player.html`** (in this same folder) in any browser — double-click it, tap a track, press ▶. Works from a USB stick, in airplane mode, no internet, no install. It auto-finds both downloaded files (green dot = ready, red dot = missing), has ⏮/⏭ track skipping, auto-plays the next song, and you can also drag-and-drop any audio file onto it.
+- **Easiest:** open **`player.html`** (in this same folder) in any browser — double-click it, tap a track, press ▶. Works from a USB stick, in airplane mode, no internet, no install. It auto-finds all three downloaded files (green dot = ready, red dot = missing), has ⏮/⏭ track skipping, auto-plays the next song, and you can also drag-and-drop any audio file onto it.
 - **Phone:** copy the `.mp3`/`.m4a` files to your phone's **Music** or **Downloads** folder (USB cable, email them to yourself, or cloud drive) — they show up in your normal music app.
 - **Car/truck:** copy them to a USB stick.
 
@@ -75,8 +89,8 @@ python3 download.py --check         # test your setup, download nothing
 
 ## Option 3 — Just want them on your phone fast?
 
-Do Option 2 on a computer, then plug the phone in with USB and copy the two
-audio files across. ~5–8 MB each, plays forever offline. Done.
+Do Option 2 on a computer, then plug the phone in with USB and copy the
+audio files across. ~4–8 MB each, plays forever offline. Done.
 
 ---
 
@@ -84,8 +98,8 @@ audio files across. ~5–8 MB each, plays forever offline. Done.
 | File | What it is |
 |---|---|
 | `download.py` | The downloader (installs yt-dlp itself; `--list`, `--check`, per-track numbers/names supported) |
-| `download.bat` | Windows double-click launcher (both tracks) |
-| `download.sh` | Mac/Linux/Termux launcher (forwards args, e.g. `./download.sh 2`) |
+| `download.bat` | Windows double-click launcher (all tracks) |
+| `download.sh` | Mac/Linux/Termux launcher (forwards args, e.g. `./download.sh 3`) |
 | `player.html` | Offline playlist player — one self-contained page, no internet needed |
 
 ### Troubleshooting
@@ -93,11 +107,12 @@ audio files across. ~5–8 MB each, plays forever offline. Done.
 - **"Python was not found"** → install from https://www.python.org/downloads/ (tick *Add to PATH* on Windows), then re-run.
 - **Download worked but file is `.m4a`, not `.mp3`** → that's fine, it plays everywhere. Install ffmpeg and re-run if you specifically need MP3.
 - **Player shows a red "missing" dot** → that track's audio file must sit in the *same folder* as `player.html` (run the downloader), or use the track list / **Choose audio file…** button.
-- **Wrong song version?** Track 2 uses the Official Yelawolf topic audio (`hnnVACOif1U`, EMPIRE) — not a live/fan re-upload.
+- **Wrong song version?** Tracks 2–3 use the Official topic audios (Yelawolf `hnnVACOif1U`, EMPIRE; T-Pain `L_o25kYUe4g`, DistroKid) — not live/fan re-uploads, lyric videos, or remixes.
 
 ### Note
-Both tracks are copyrighted (*Catfish Billy 2* ℗ 2019 Slumerican / Shady /
-Interscope; *My Bad Habit* © 2025 F.O.W.B Independent Records L.L.C.) — keep
+All tracks are copyrighted (*Club Husband* ℗ 2025 Nappy Boy Entertainment;
+*Catfish Billy 2* ℗ 2019 Slumerican / Shady / Interscope; *My Bad Habit*
+© 2025 F.O.W.B Independent Records L.L.C.) — keep
 your downloads for your own personal offline listening, and support the
 artists via the official links above. Downloaded audio is git-ignored here
 so it never gets committed to the CertPay repo.
